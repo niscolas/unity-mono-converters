@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
 
 namespace Plugins.MonoConverters {
-	public class FloatStringConverter : BaseValueConverter<float, string> {
-		protected override string Inner_Convert(float value) {
-			return value.ToString(CultureInfo.InvariantCulture);
+	public class FloatStringConverter : BaseMonoConverter<float, string> {
+		protected override string Inner_Convert(float entryValue) {
+			return entryValue.ToString(CultureInfo.InvariantCulture);
 		}
 	}
 }
