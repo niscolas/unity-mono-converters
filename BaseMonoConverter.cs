@@ -1,8 +1,19 @@
-﻿using UnityEngine;
+﻿using UnityAtoms;
+using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Plugins.MonoConverters {
 	public abstract class BaseMonoConverter<TEntry, TExit> : MonoBehaviour {
+		[FormerlySerializedAs("selectGameObjectFunction")]
+		[SerializeField]
+		private AtomFunction<TExit, TExit> filterExitFunc;
+		
+		[Space]
+		[SerializeField]
+		private AtomCondition<TExit>[] conditions;
+
+		[Header("Events")]
 		[SerializeField]
 		private UnityEvent<TExit> onConverted;
 
@@ -14,7 +25,19 @@ namespace Plugins.MonoConverters {
 				return;
 			}
 
-			onConverted?.Invoke(Inner_Convert(entryValue));
+			TExit exitValue = Inner_Convert(entryValue);
+
+			if (filterExitFunc) {
+				exitValue = filterExitFunc.Call(exitValue);
+			}
+
+			foreach (AtomCondition<TExit> condition in conditions) {
+				if (!condition.Call(exitValue)) {
+					return;
+				}
+			}
+
+			onConverted?.Invoke(exitValue);
 		}
 	}
 }
